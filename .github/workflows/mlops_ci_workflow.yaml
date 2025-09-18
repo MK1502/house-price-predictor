@@ -35,13 +35,27 @@ jobs:
         run: |
           python src/features/engineer.py \
             --input data/processed/cleaned_house_data.csv \
-            --output data/features/feature_data.csv \
-            --preprocessor_path models/preprocessor.pkl
+            --output data/processed/feature_data.csv \
+            --preprocessor models/preprocessor.pkl
+
+      - name : Start MLflow Server
+        run: |
+          docker pull ghcr.io/mlflow/mlflow:latest
+          docker run -d -p 5555:5000 --name mlflow-server ghcr.io/mlflow/mlflow:latest \
+            mlflow server --host 0.0.0.0 \
+            --backend-store-uri sqlite:///mlflow.db \
+            --default-artifact-root /tmp/mlruns
 
       - name: Train Model
         run: |
           python src/models/train_model.py \
             --config src/models/model_config.yaml \
-            --data data/processed/featured_house_data.csv \
+            --data data/processed/featured_data.csv \
             --models-dir models \
             --mlflow-tracking-uri http://localhost:5555
+
+      - name: Cleaning uo MLflow Server
+        run: |
+          docker stop mlflow-server
+          docker rm mlflow-server
+          docker rmi ghcr.io/mlflow/mlflow:latest

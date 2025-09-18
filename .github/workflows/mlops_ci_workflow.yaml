@@ -73,6 +73,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: mykyta15/fastapi:{{ github.sha }}
+          tags: mykyta15/fastapi:${{ github.sha }}
           context: "."
           file: "Dockerfile"

@@ -1,6 +1,7 @@
 name: MLOps CI
 
-workflow_dispatch: {}
+on:
+  workflow_dispatch: {}
 
 jobs:
   e2e_workflow:
